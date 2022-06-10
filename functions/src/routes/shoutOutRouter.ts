@@ -72,44 +72,22 @@ shoutOutRouter.put("/upvote/:id", async (req, res) => {
     errorResponse(err, res);
   }
 });
-
-// shoutOutRouter.put("/upvote/:id", async (req, res) => {
-//   const id: string = req.params.id;
-//   const user: any = req.body;
-//   try {
-//     const client = await getClient();
-//     const update = await client
-//       .db()
-//       .collection<ShoutOut>("shoutouts")
-//       .updateOne(
-//         { _id: new ObjectId(id) },
-//         { $push: { likes: { displayName: user.displayName, uid: user.uid } } }
-//       );
-//     if (update.modifiedCount === 0) {
-//       res.status(404).json({ message: `id not found` });
-//     } else {
-//       res.status(201).json(user);
-//     }
-//   } catch (err) {
-//     errorResponse(err, res);
-//   }
-// });
 shoutOutRouter.put("/downvote/:id", async (req, res) => {
   const id: string = req.params.id;
-  const user: any = req.body;
+  const user: User = req.body;
   try {
     const client = await getClient();
-    const update = await client
+    const result = await client
       .db()
       .collection<ShoutOut>("shoutouts")
       .updateOne(
         { _id: new ObjectId(id) },
-        { $pull: { likes: { displayName: user.displayName, uid: user.uid } } }
+        { $pull: { likes: { uid: user.uid } } }
       );
-    if (update.modifiedCount === 0) {
-      res.status(404).json({ message: `id not found` });
+    if (result.modifiedCount === 0) {
+      res.status(404).json({ message: "Id not found" });
     } else {
-      res.status(201).json(user);
+      res.sendStatus(204);
     }
   } catch (err) {
     errorResponse(err, res);
